@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>add.png</file>
+        <file>icon.png</file>
+        <file>HL.png</file>
+        <file>VL.png</file>
+        <file>save.png</file>
+        <file>ZoomFit.png</file>
+        <file>ZoomOriginal.png</file>
+        <file>new.png</file>
+    </qresource>
+</RCC>
