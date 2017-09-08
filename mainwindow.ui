@@ -120,6 +120,7 @@
    <addaction name="actionZoomOriginal"/>
    <addaction name="actionZoomFit"/>
    <addaction name="actionSave"/>
+   <addaction name="actionAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAdd">
@@ -204,6 +205,18 @@
    </property>
    <property name="toolTip">
     <string>新建</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/about.png</normaloff>:/about.png</iconset>
+   </property>
+   <property name="text">
+    <string>about</string>
+   </property>
+   <property name="toolTip">
+    <string>关于</string>
    </property>
   </action>
  </widget>

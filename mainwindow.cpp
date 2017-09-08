@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);    
-    move((QApplication::desktop()->width()-width())/2,(QApplication::desktop()->height()-height())/2);
+    move((QApplication::desktop()->width()-width())/2,(QApplication::desktop()->height()-height())/2);    
     path = "";
 }
 
@@ -125,6 +125,6 @@ void MainWindow::on_actionSave_triggered()
 void MainWindow::on_actionAbout_triggered()
 {
     QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "海天鹰拼图 1.0\n一款基于Qt的拼图程序。\n作者：黄颖\nE-mail: sonichy@163.com\n主页：sonichy.96.lt");
-    aboutMB.setIconPixmap(QPixmap(":/icon.png"));
+    aboutMB.setIconPixmap(QPixmap(":/icon.png").scaled(200,200));
     aboutMB.exec();
 }
