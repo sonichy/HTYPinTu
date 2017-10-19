@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);    
-    move((QApplication::desktop()->width()-width())/2,(QApplication::desktop()->height()-height())/2);    
+    move( (QApplication::desktop()->width()-width())/2, (QApplication::desktop()->height()-height())/2 );
     path = "";
     isArray = false;
 
@@ -40,8 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
     vbox->addLayout(hbox);
     label = new QLabel("间隙：");
     spinMargin = new QSpinBox;
-    spinMargin->setRange(1,50);
-    spinMargin->setValue(10);
+    spinMargin->setRange(0,200);
+    spinMargin->setValue(40);
     hbox = new QHBoxLayout;
     hbox->addWidget(label,0,Qt::AlignCenter);
     hbox->addWidget(spinMargin);
@@ -171,7 +171,7 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "海天鹰拼图 2.0\n一款基于Qt的拼图程序。\n作者：黄颖\nE-mail: sonichy@163.com\n主页：sonichy.96.lt");
+    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "海天鹰拼图 2.0\n一款基于Qt的拼图程序，支持横排、竖排、阵列。\n作者：黄颖\nE-mail: sonichy@163.com\n主页：sonichy.96.lt");
     aboutMB.setIconPixmap(QPixmap(":/icon.png").scaled(200,200));
     aboutMB.exec();
 }
@@ -182,12 +182,12 @@ void MainWindow::on_actionArray_triggered()
         isArray = true;
         ui->listWidget->clear();
         QImage image( ui->listWidgetIcon->item(0)->toolTip() );
-        imageArray = QImage( (image.width() + spinMargin->value())*spinc->value() + spinMargin->value(), (image.height() + spinMargin->value())*spinr->value(), QImage::Format_RGB32 );
+        imageArray = QImage( (image.width() + spinMargin->value())*spinc->value() + spinMargin->value(), (image.height() + spinMargin->value())*spinr->value()+ spinMargin->value(), QImage::Format_RGB32 );
         imageArray.fill(Qt::white);
         QPainter painter(&imageArray);
         for(int r=0; r< spinr->value(); r++){
             for(int c=0; c<spinc->value(); c++){
-                painter.drawImage((image.width() + spinMargin->value())*c + spinMargin->value(), (image.height() + spinMargin->value())*r, image);
+                painter.drawImage((image.width() + spinMargin->value())*c + spinMargin->value(), (image.height() + spinMargin->value())*r + spinMargin->value(), image);
             }
         }
         ui->listWidget->addItem(new QListWidgetItem(QIcon(QPixmap::fromImage(imageArray)),""));
