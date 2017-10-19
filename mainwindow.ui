@@ -56,6 +56,9 @@
         <property name="dragEnabled">
          <bool>true</bool>
         </property>
+        <property name="defaultDropAction">
+         <enum>Qt::TargetMoveAction</enum>
+        </property>
         <property name="iconSize">
          <size>
           <width>100</width>
@@ -117,6 +120,7 @@
    <addaction name="actionAdd"/>
    <addaction name="actionVertical"/>
    <addaction name="actionHorizontal"/>
+   <addaction name="actionArray"/>
    <addaction name="actionZoomOriginal"/>
    <addaction name="actionZoomFit"/>
    <addaction name="actionSave"/>
@@ -217,6 +221,18 @@
    </property>
    <property name="toolTip">
     <string>关于</string>
+   </property>
+  </action>
+  <action name="actionArray">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/array.png</normaloff>:/array.png</iconset>
+   </property>
+   <property name="text">
+    <string>array</string>
+   </property>
+   <property name="toolTip">
+    <string>阵列</string>
    </property>
   </action>
  </widget>

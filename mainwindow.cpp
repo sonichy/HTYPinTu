@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <QFileDialog>
@@ -6,6 +6,9 @@
 #include <QPainter>
 #include <QDateTime>
 #include <QMessageBox>
+#include <QSpinBox>
+#include <QLabel>
+#include <QPushButton>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,6 +17,45 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);    
     move((QApplication::desktop()->width()-width())/2,(QApplication::desktop()->height()-height())/2);    
     path = "";
+    isArray = false;
+
+    dialog = new QDialog(this);
+    dialog->setWindowTitle("阵列");
+    QVBoxLayout *vbox = new QVBoxLayout;
+    QHBoxLayout *hbox = new QHBoxLayout;
+    QLabel *label = new QLabel("列：");
+    spinc = new QSpinBox;
+    spinc->setRange(1,10);
+    spinc->setValue(4);
+    hbox->addWidget(label,0,Qt::AlignCenter);
+    hbox->addWidget(spinc);
+    vbox->addLayout(hbox);
+    label = new QLabel("行：");
+    spinr = new QSpinBox;
+    spinr->setRange(1,10);
+    spinr->setValue(2);
+    hbox = new QHBoxLayout;
+    hbox->addWidget(label,0,Qt::AlignCenter);
+    hbox->addWidget(spinr);
+    vbox->addLayout(hbox);
+    label = new QLabel("间隙：");
+    spinMargin = new QSpinBox;
+    spinMargin->setRange(1,50);
+    spinMargin->setValue(10);
+    hbox = new QHBoxLayout;
+    hbox->addWidget(label,0,Qt::AlignCenter);
+    hbox->addWidget(spinMargin);
+    vbox->addLayout(hbox);
+    QPushButton *pushButtonConfirm = new QPushButton("确定");
+    QPushButton *pushButtonCancel = new QPushButton("取消");
+    hbox = new QHBoxLayout;
+    hbox->addWidget(pushButtonConfirm);
+    hbox->addWidget(pushButtonCancel);
+    vbox->addLayout(hbox);
+    dialog->setLayout(vbox);
+    connect(pushButtonConfirm, SIGNAL(clicked()), dialog, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), dialog, SLOT(reject()));
+
 }
 
 MainWindow::~MainWindow()
@@ -29,6 +71,7 @@ void MainWindow::on_actionNew_triggered()
 
 void MainWindow::on_actionAdd_triggered()
 {
+    isArray = false;
     if(path==""){
         path = QFileDialog::getOpenFileName(this,"打开图片", ".", "图片文件(*.jpg *.jpeg *.png *.bmp)");
     }else{
@@ -78,53 +121,75 @@ void MainWindow::on_actionSave_triggered()
         path = QFileDialog::getSaveFileName(this,"保存图片",path,"图片文件(*.jpg *.png *.bmp)");
     }
     if(path.length() != 0){
-        int pw=0,ph=0;
-        for(int i=0;i<ui->listWidget->count();i++){
-            QPixmap pixmapItem(ui->listWidgetIcon->item(i)->toolTip());
-            if(ui->listWidget->flow() == QListView::TopToBottom){
-                ph += pixmapItem.height();
-            }
-            if(ui->listWidget->flow() == QListView::LeftToRight){
-                pw += pixmapItem.width();                
-            }
-        }
-        QPixmap pixmapItem(ui->listWidgetIcon->item(0)->toolTip());
-        if(ui->listWidget->flow() == QListView::TopToBottom){
-            pw = pixmapItem.width();
-        }
-        if(ui->listWidget->flow() == QListView::LeftToRight){
-            ph = pixmapItem.height();
-        }
-        qDebug() << pw << " X " << ph;
-        QPixmap pixmap = QPixmap(pw,ph);
-        pixmap.fill(Qt::white);
-        QPainter painter(&pixmap);
-        qDebug() << "count" << ui->listWidget->count();
-        int x=0,y=0;
-        for(int i=0;i<ui->listWidget->count();i++){
-            QPixmap pixmapItem(ui->listWidgetIcon->item(i)->toolTip());
-            if(ui->listWidget->flow() == QListView::TopToBottom){
-                if(i>0){
-                    QPixmap pixmapPrev(ui->listWidgetIcon->item(i-1)->toolTip());
-                    y += pixmapPrev.height();
+        if(isArray){
+            imageArray.save(path,0,100);
+        }else{
+            int pw=0,ph=0;
+            for(int i=0;i<ui->listWidget->count();i++){
+                QPixmap pixmapItem(ui->listWidgetIcon->item(i)->toolTip());
+                if(ui->listWidget->flow() == QListView::TopToBottom){
+                    ph += pixmapItem.height();
+                }
+                if(ui->listWidget->flow() == QListView::LeftToRight){
+                    pw += pixmapItem.width();
                 }
             }
-            if(ui->listWidget->flow() == QListView::LeftToRight){
-                if(i>0){
-                    QPixmap pixmapPrev(ui->listWidgetIcon->item(i-1)->toolTip());
-                    x += pixmapPrev.width();
-                }
+            QPixmap pixmapItem(ui->listWidgetIcon->item(0)->toolTip());
+            if(ui->listWidget->flow() == QListView::TopToBottom){
+                pw = pixmapItem.width();
             }
-            painter.drawPixmap(x,y,pixmapItem);
+            if(ui->listWidget->flow() == QListView::LeftToRight){
+                ph = pixmapItem.height();
+            }
+            qDebug() << pw << " X " << ph;
+            QPixmap pixmap = QPixmap(pw,ph);
+            pixmap.fill(Qt::white);
+            QPainter painter(&pixmap);
+            qDebug() << "count" << ui->listWidget->count();
+            int x=0,y=0;
+            for(int i=0;i<ui->listWidget->count();i++){
+                QPixmap pixmapItem(ui->listWidgetIcon->item(i)->toolTip());
+                if(ui->listWidget->flow() == QListView::TopToBottom){
+                    if(i>0){
+                        QPixmap pixmapPrev(ui->listWidgetIcon->item(i-1)->toolTip());
+                        y += pixmapPrev.height();
+                    }
+                }
+                if(ui->listWidget->flow() == QListView::LeftToRight){
+                    if(i>0){
+                        QPixmap pixmapPrev(ui->listWidgetIcon->item(i-1)->toolTip());
+                        x += pixmapPrev.width();
+                    }
+                }
+                painter.drawPixmap(x,y,pixmapItem);
+            }
+            pixmap.save(path,0,100);
         }
-        pixmap.save(path,0,100);
         ui->statusBar->showMessage("保存 " + path);
     }
 }
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "海天鹰拼图 1.0\n一款基于Qt的拼图程序。\n作者：黄颖\nE-mail: sonichy@163.com\n主页：sonichy.96.lt");
+    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "海天鹰拼图 2.0\n一款基于Qt的拼图程序。\n作者：黄颖\nE-mail: sonichy@163.com\n主页：sonichy.96.lt");
     aboutMB.setIconPixmap(QPixmap(":/icon.png").scaled(200,200));
     aboutMB.exec();
+}
+
+void MainWindow::on_actionArray_triggered()
+{
+    if(dialog->exec()==QDialog::Accepted){
+        isArray = true;
+        ui->listWidget->clear();
+        QImage image( ui->listWidgetIcon->item(0)->toolTip() );
+        imageArray = QImage( (image.width() + spinMargin->value())*spinc->value() + spinMargin->value(), (image.height() + spinMargin->value())*spinr->value(), QImage::Format_RGB32 );
+        imageArray.fill(Qt::white);
+        QPainter painter(&imageArray);
+        for(int r=0; r< spinr->value(); r++){
+            for(int c=0; c<spinc->value(); c++){
+                painter.drawImage((image.width() + spinMargin->value())*c + spinMargin->value(), (image.height() + spinMargin->value())*r, image);
+            }
+        }
+        ui->listWidget->addItem(new QListWidgetItem(QIcon(QPixmap::fromImage(imageArray)),""));
+    }
 }
