@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);    
+    ui->setupUi(this);
     move( (QApplication::desktop()->width()-width())/2, (QApplication::desktop()->height()-height())/2 );
     path = "";
     isArray = false;
@@ -124,8 +124,9 @@ void MainWindow::on_actionSave_triggered()
         if(isArray){
             imageArray.save(path,0,100);
         }else{
-            int pw=0,ph=0;
-            for(int i=0;i<ui->listWidget->count();i++){
+            int pw=0, ph=0;
+            // 竖排计算总高，横排计算总宽
+            for(int i=0; i<ui->listWidget->count(); i++){
                 QPixmap pixmapItem(ui->listWidgetIcon->item(i)->toolTip());
                 if(ui->listWidget->flow() == QListView::TopToBottom){
                     ph += pixmapItem.height();
@@ -134,20 +135,30 @@ void MainWindow::on_actionSave_triggered()
                     pw += pixmapItem.width();
                 }
             }
-            QPixmap pixmapItem(ui->listWidgetIcon->item(0)->toolTip());
+
+            // 竖排取最大宽，横排取最大高
             if(ui->listWidget->flow() == QListView::TopToBottom){
-                pw = pixmapItem.width();
+                for(int i=0; i<ui->listWidget->count()-1; i++){
+                    QPixmap pixmapItem1(ui->listWidgetIcon->item(i)->toolTip());
+                    QPixmap pixmapItem2(ui->listWidgetIcon->item(i+1)->toolTip());
+                    pw = qMax(pixmapItem1.width(),pixmapItem2.width());
+                }
             }
             if(ui->listWidget->flow() == QListView::LeftToRight){
-                ph = pixmapItem.height();
+                for(int i=0; i<ui->listWidget->count()-1; i++){
+                    QPixmap pixmapItem1(ui->listWidgetIcon->item(i)->toolTip());
+                    QPixmap pixmapItem2(ui->listWidgetIcon->item(i+1)->toolTip());
+                    ph = qMax(pixmapItem1.height(),pixmapItem2.height());
+                }
             }
+
             qDebug() << pw << " X " << ph;
             QPixmap pixmap = QPixmap(pw,ph);
             pixmap.fill(Qt::white);
             QPainter painter(&pixmap);
             qDebug() << "count" << ui->listWidget->count();
             int x=0,y=0;
-            for(int i=0;i<ui->listWidget->count();i++){
+            for(int i=0; i<ui->listWidget->count(); i++){
                 QPixmap pixmapItem(ui->listWidgetIcon->item(i)->toolTip());
                 if(ui->listWidget->flow() == QListView::TopToBottom){
                     if(i>0){
@@ -171,7 +182,7 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "海天鹰拼图 2.0\n一款基于Qt的拼图程序，支持横排、竖排、阵列。\n作者：黄颖\nE-mail: sonichy@163.com\n主页：sonichy.96.lt");
+    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "海天鹰拼图 2.1\n一款基于Qt的拼图程序，支持横排、竖排、阵列。\n作者：黄颖\nE-mail: sonichy@163.com\n主页：sonichy.96.lt");
     aboutMB.setIconPixmap(QPixmap(":/icon.png").scaled(200,200));
     aboutMB.exec();
 }
