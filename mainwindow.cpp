@@ -9,13 +9,14 @@
 #include <QSpinBox>
 #include <QLabel>
 #include <QPushButton>
+#include <QMimeData>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    move( (QApplication::desktop()->width()-width())/2, (QApplication::desktop()->height()-height())/2 );
+    move((QApplication::desktop()->width()-width())/2, (QApplication::desktop()->height()-height())/2 );
     path = "";
     isArray = false;
 
@@ -79,15 +80,20 @@ void MainWindow::on_actionAdd_triggered()
     }
     qDebug() << path;
     if(path.length() != 0){
-        QListWidgetItem *LWIicon,*LWI;
-        LWIicon = new QListWidgetItem(QIcon(path),"");
-        LWIicon->setToolTip(path);
-        ui->listWidgetIcon->insertItem(ui->listWidgetIcon->count()+1,LWIicon);
-        ui->listWidget->setIconSize(ui->listWidget->size());
-        LWI = new QListWidgetItem(QIcon(path),"");
-        //LWI->setTextAlignment(Qt::AlignCenter);
-        ui->listWidget->insertItem(ui->listWidget->count()+1,LWI);
+        add(path);
     }
+}
+
+void MainWindow::add(QString spath)
+{
+    QListWidgetItem *LWIicon,*LWI;
+    LWIicon = new QListWidgetItem(QIcon(spath),"");
+    LWIicon->setToolTip(spath);
+    ui->listWidgetIcon->insertItem(ui->listWidgetIcon->count() + 1, LWIicon);
+    ui->listWidget->setIconSize(ui->listWidget->size());
+    LWI = new QListWidgetItem(QIcon(spath),"");
+    //LWI->setTextAlignment(Qt::AlignCenter);
+    ui->listWidget->insertItem(ui->listWidget->count()+1,LWI);
 }
 
 void MainWindow::on_actionVertical_triggered()
@@ -113,12 +119,13 @@ void MainWindow::on_actionZoomOriginal_triggered()
 
 void MainWindow::on_actionSave_triggered()
 {
+    QDateTime time = QDateTime::currentDateTime();
+    QString filename = time.toString("yyyyMMddhhmmss") + ".jpg";
     if(path==""){
-        path = QFileDialog::getSaveFileName(this,"保存图片","./未命名.jpg","图片文件(*.jpg *.png *.bmp)");
+        path = QFileDialog::getSaveFileName(this, "保存图片", "./" + filename , "图片文件(*.jpg *.png *.bmp)");
     }else{
-        QDateTime time = QDateTime::currentDateTime();
-        path = QFileInfo(path).absolutePath() + "/" + time.toString("yyyyMMddhhmmss") + ".jpg";
-        path = QFileDialog::getSaveFileName(this,"保存图片",path,"图片文件(*.jpg *.png *.bmp)");
+        path = QFileInfo(path).absolutePath() + "/" + filename;
+        path = QFileDialog::getSaveFileName(this, "保存图片", path,"图片文件(*.jpg *.png *.bmp)");
     }
     if(path.length() != 0){
         if(isArray){
@@ -203,4 +210,31 @@ void MainWindow::on_actionArray_triggered()
         }
         ui->listWidget->addItem(new QListWidgetItem(QIcon(QPixmap::fromImage(imageArray)),""));
     }
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *e)
+{
+    qDebug() << e->mimeData()->formats().at(0);
+    //if(e->mimeData()->hasFormat("text/uri-list")) //只能打开文本文件
+        e->acceptProposedAction(); //可以在这个窗口部件上拖放对象
+}
+
+void MainWindow::dropEvent(QDropEvent *e) //释放对方时，执行的操作
+{
+    QList<QUrl> urls = e->mimeData()->urls();
+    if(urls.isEmpty())
+        return ;
+
+    QString fileName = urls.first().toLocalFile();
+
+    foreach (QUrl u, urls) {
+        qDebug() << u.toString();
+    }
+    qDebug() << urls.size();
+
+    if(fileName.isEmpty())
+        return;
+
+    path = fileName;
+    add(path);
 }

@@ -13,6 +13,9 @@
   <property name="contextMenuPolicy">
    <enum>Qt::NoContextMenu</enum>
   </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>海天鹰拼图</string>
   </property>
@@ -21,6 +24,9 @@
     <normaloff>:/icon.png</normaloff>:/icon.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="acceptDrops">
+    <bool>true</bool>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="topMargin">
      <number>0</number>
@@ -81,6 +87,9 @@
       </item>
       <item>
        <widget class="QListWidget" name="listWidget">
+        <property name="acceptDrops">
+         <bool>true</bool>
+        </property>
         <property name="flow">
          <enum>QListView::TopToBottom</enum>
         </property>
@@ -107,6 +116,9 @@
    </property>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
+   <property name="acceptDrops">
+    <bool>true</bool>
+   </property>
    <property name="movable">
     <bool>false</bool>
    </property>

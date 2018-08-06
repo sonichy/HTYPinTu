@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QSpinBox>
+#include <QDragEnterEvent>
 
 namespace Ui {
 class MainWindow;
@@ -16,6 +17,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+protected:
+    void dragEnterEvent(QDragEnterEvent *e);
+    void dropEvent(QDropEvent *e);
+
 private:
     Ui::MainWindow *ui;
     QString path;
@@ -23,6 +28,7 @@ private:
     QDialog *dialog;
     QSpinBox *spinc,*spinr,*spinMargin;
     bool isArray;
+    void add(QString spath);
 
 private slots:
     void on_actionNew_triggered();
@@ -33,7 +39,7 @@ private slots:
     void on_actionZoomFit_triggered();
     void on_actionZoomOriginal_triggered();
     void on_actionSave_triggered();
-    void on_actionAbout_triggered();    
+    void on_actionAbout_triggered();
 };
 
 #endif // MAINWINDOW_H
