@@ -20,6 +20,12 @@ MainWindow::MainWindow(QWidget *parent) :
     path = "";
     isArray = false;
 
+    comboBox_zoom_type = new QComboBox;
+    comboBox_zoom_type->addItem("原始大小",ORIGINAL);
+    comboBox_zoom_type->addItem("适应小图",FIT_SMALL);
+    comboBox_zoom_type->addItem("适应大图",FIT_BIG);
+    ui->mainToolBar->addWidget(comboBox_zoom_type);
+
     dialog = new QDialog(this);
     dialog->setWindowTitle("阵列");
     QVBoxLayout *vbox = new QVBoxLayout;
@@ -73,7 +79,7 @@ void MainWindow::on_actionNew_triggered()
 void MainWindow::on_actionAdd_triggered()
 {
     isArray = false;
-    if(path==""){
+    if(path == ""){
         path = QFileDialog::getOpenFileName(this,"打开图片", ".", "图片文件(*.jpg *.jpeg *.png *.bmp)");
     }else{
         path = QFileDialog::getOpenFileName(this,"打开图片", path, "图片文件(*.jpg *.jpeg *.png *.bmp)");
@@ -86,7 +92,7 @@ void MainWindow::on_actionAdd_triggered()
 
 void MainWindow::add(QString spath)
 {
-    QListWidgetItem *LWIicon,*LWI;
+    QListWidgetItem *LWIicon, *LWI;
     LWIicon = new QListWidgetItem(QIcon(spath),"");
     LWIicon->setToolTip(spath);
     ui->listWidgetIcon->insertItem(ui->listWidgetIcon->count() + 1, LWIicon);
@@ -121,7 +127,7 @@ void MainWindow::on_actionSave_triggered()
 {
     QDateTime time = QDateTime::currentDateTime();
     QString filename = time.toString("yyyyMMddhhmmss") + ".jpg";
-    if(path==""){
+    if(path == ""){
         path = QFileDialog::getSaveFileName(this, "保存图片", "./" + filename , "图片文件(*.jpg *.png *.bmp)");
     }else{
         path = QFileInfo(path).absolutePath() + "/" + filename;
@@ -131,31 +137,49 @@ void MainWindow::on_actionSave_triggered()
         if(isArray){
             imageArray.save(path,0,100);
         }else{
+            Zoom_Type zoom_type = (Zoom_Type)(comboBox_zoom_type->currentIndex());
             int pw=0, ph=0;
-            // 竖排计算总高，横排计算总宽
-            for(int i=0; i<ui->listWidget->count(); i++){
-                QPixmap pixmapItem(ui->listWidgetIcon->item(i)->toolTip());
-                if(ui->listWidget->flow() == QListView::TopToBottom){
-                    ph += pixmapItem.height();
-                }
-                if(ui->listWidget->flow() == QListView::LeftToRight){
-                    pw += pixmapItem.width();
-                }
-            }
 
-            // 竖排取最大宽，横排取最大高
+            // 竖排算宽度
             if(ui->listWidget->flow() == QListView::TopToBottom){
                 for(int i=0; i<ui->listWidget->count()-1; i++){
                     QPixmap pixmapItem1(ui->listWidgetIcon->item(i)->toolTip());
                     QPixmap pixmapItem2(ui->listWidgetIcon->item(i+1)->toolTip());
-                    pw = qMax(pixmapItem1.width(),pixmapItem2.width());
+                    if(zoom_type == FIT_SMALL){
+                        pw = qMin(pixmapItem1.width(), pixmapItem2.width());
+                    }else{
+                        pw = qMax(pixmapItem1.width(), pixmapItem2.width());
+                    }
                 }
             }
+
+            //横排算高度
             if(ui->listWidget->flow() == QListView::LeftToRight){
                 for(int i=0; i<ui->listWidget->count()-1; i++){
                     QPixmap pixmapItem1(ui->listWidgetIcon->item(i)->toolTip());
                     QPixmap pixmapItem2(ui->listWidgetIcon->item(i+1)->toolTip());
-                    ph = qMax(pixmapItem1.height(),pixmapItem2.height());
+                    if(zoom_type == FIT_SMALL){
+                        ph = qMin(pixmapItem1.height(), pixmapItem2.height());
+                    }else{
+                        ph = qMax(pixmapItem1.height(), pixmapItem2.height());
+                    }
+                }
+            }
+
+            // 竖排计算总高，横排计算总宽
+            for(int i=0; i<ui->listWidget->count(); i++){
+                QPixmap pixmapItem(ui->listWidgetIcon->item(i)->toolTip());
+                if(ui->listWidget->flow() == QListView::TopToBottom){
+                    if(zoom_type == FIT_SMALL){
+                        pixmapItem = pixmapItem.scaledToWidth(pw);
+                    }
+                    ph += pixmapItem.height();
+                }
+                if(ui->listWidget->flow() == QListView::LeftToRight){
+                    if(zoom_type == FIT_SMALL){
+                       pixmapItem = pixmapItem.scaledToHeight(ph);
+                    }
+                    pw += pixmapItem.width();
                 }
             }
 
@@ -164,19 +188,31 @@ void MainWindow::on_actionSave_triggered()
             pixmap.fill(Qt::white);
             QPainter painter(&pixmap);
             qDebug() << "count" << ui->listWidget->count();
-            int x=0,y=0;
+            int x=0, y=0;
             for(int i=0; i<ui->listWidget->count(); i++){
                 QPixmap pixmapItem(ui->listWidgetIcon->item(i)->toolTip());
                 if(ui->listWidget->flow() == QListView::TopToBottom){
                     if(i>0){
                         QPixmap pixmapPrev(ui->listWidgetIcon->item(i-1)->toolTip());
+                        if(zoom_type == FIT_SMALL){
+                            pixmapPrev = pixmapPrev.scaledToWidth(pw);
+                        }
                         y += pixmapPrev.height();
+                        if(zoom_type == FIT_SMALL){
+                           pixmapItem = pixmapItem.scaledToWidth(pw,Qt::SmoothTransformation);
+                        }
                     }
                 }
                 if(ui->listWidget->flow() == QListView::LeftToRight){
                     if(i>0){
                         QPixmap pixmapPrev(ui->listWidgetIcon->item(i-1)->toolTip());
+                        if(zoom_type == FIT_SMALL){
+                            pixmapPrev = pixmapPrev.scaledToHeight(ph);
+                        }
                         x += pixmapPrev.width();
+                        if(zoom_type == FIT_SMALL){
+                           pixmapItem = pixmapItem.scaledToHeight(ph,Qt::SmoothTransformation);
+                        }
                     }
                 }
                 painter.drawPixmap(x,y,pixmapItem);

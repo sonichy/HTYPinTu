@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QSpinBox>
 #include <QDragEnterEvent>
+#include <QComboBox>
 
 namespace Ui {
 class MainWindow;
@@ -29,6 +30,12 @@ private:
     QSpinBox *spinc,*spinr,*spinMargin;
     bool isArray;
     void add(QString spath);
+    enum Zoom_Type  {
+        ORIGINAL,
+        FIT_SMALL,
+        FIT_BIG
+    };
+    QComboBox *comboBox_zoom_type;
 
 private slots:
     void on_actionNew_triggered();
