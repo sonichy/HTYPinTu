@@ -140,7 +140,7 @@ void MainWindow::on_actionSave_triggered()
             Zoom_Type zoom_type = (Zoom_Type)(comboBox_zoom_type->currentIndex());
             int pw=0, ph=0;
 
-            // 竖排算宽度
+            // 取竖排宽度
             if(ui->listWidget->flow() == QListView::TopToBottom){
                 for(int i=0; i<ui->listWidget->count()-1; i++){
                     QPixmap pixmapItem1(ui->listWidgetIcon->item(i)->toolTip());
@@ -153,7 +153,7 @@ void MainWindow::on_actionSave_triggered()
                 }
             }
 
-            //横排算高度
+            // 取横排高度
             if(ui->listWidget->flow() == QListView::LeftToRight){
                 for(int i=0; i<ui->listWidget->count()-1; i++){
                     QPixmap pixmapItem1(ui->listWidgetIcon->item(i)->toolTip());
@@ -198,9 +198,10 @@ void MainWindow::on_actionSave_triggered()
                             pixmapPrev = pixmapPrev.scaledToWidth(pw);
                         }
                         y += pixmapPrev.height();
-                        if(zoom_type == FIT_SMALL){
-                           pixmapItem = pixmapItem.scaledToWidth(pw,Qt::SmoothTransformation);
-                        }
+
+                    }
+                    if(zoom_type == FIT_SMALL){
+                       pixmapItem = pixmapItem.scaledToWidth(pw, Qt::SmoothTransformation);
                     }
                 }
                 if(ui->listWidget->flow() == QListView::LeftToRight){
@@ -210,9 +211,9 @@ void MainWindow::on_actionSave_triggered()
                             pixmapPrev = pixmapPrev.scaledToHeight(ph);
                         }
                         x += pixmapPrev.width();
-                        if(zoom_type == FIT_SMALL){
-                           pixmapItem = pixmapItem.scaledToHeight(ph,Qt::SmoothTransformation);
-                        }
+                    }
+                    if(zoom_type == FIT_SMALL){
+                       pixmapItem = pixmapItem.scaledToHeight(ph, Qt::SmoothTransformation);
                     }
                 }
                 painter.drawPixmap(x,y,pixmapItem);
@@ -225,7 +226,7 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "海天鹰拼图 2.1\n一款基于Qt的拼图程序，支持横排、竖排、阵列。\n作者：黄颖\nE-mail: sonichy@163.com\n主页：sonichy.96.lt");
+    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "海天鹰拼图 2.2\n一款基于 Qt 的拼图程序，支持横排、竖排、阵列。\n作者：黄颖\nE-mail: sonichy@163.com\n主页：sonichy.96.lt");
     aboutMB.setIconPixmap(QPixmap(":/icon.png").scaled(200,200));
     aboutMB.exec();
 }
