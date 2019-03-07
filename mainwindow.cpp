@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QMimeData>
+#include <QMimeDatabase>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,6 +26,8 @@ MainWindow::MainWindow(QWidget *parent) :
     comboBox_zoom_type->addItem("适应小图",FIT_SMALL);
     comboBox_zoom_type->addItem("适应大图",FIT_BIG);
     ui->mainToolBar->addWidget(comboBox_zoom_type);
+
+    connect(ui->listWidgetIcon->model(), SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)), this, SLOT(reorder()));
 
     dialog = new QDialog(this);
     dialog->setWindowTitle("阵列");
@@ -79,27 +82,35 @@ void MainWindow::on_actionNew_triggered()
 void MainWindow::on_actionAdd_triggered()
 {
     isArray = false;
-    if(path == ""){
-        path = QFileDialog::getOpenFileName(this,"打开图片", ".", "图片文件(*.jpg *.jpeg *.png *.bmp)");
-    }else{
-        path = QFileDialog::getOpenFileName(this,"打开图片", path, "图片文件(*.jpg *.jpeg *.png *.bmp)");
-    }
-    qDebug() << path;
-    if(path.length() != 0){
-        add(path);
+    if (path == "") path = ".";
+    QStringList SL_path = QFileDialog::getOpenFileNames(this, "打开图片", path, "图片文件(*.jpg *.jpeg *.png *.bmp)");
+    qDebug() << SL_path;
+    //    if(path.length() != 0){
+    //        add(path);
+    //    }
+    for(int i=0; i<SL_path.length(); i++){
+        QString filepath = SL_path.at(i);
+        qDebug() << filepath;
+        QString MIME = QMimeDatabase().mimeTypeForFile(filepath).name();
+        QString filetype = MIME.left(MIME.indexOf("/"));
+        qDebug() << MIME << filetype;
+        if (filetype == "image") {
+            add(filepath);
+            path = filepath;
+        }
     }
 }
 
 void MainWindow::add(QString spath)
 {
     QListWidgetItem *LWIicon, *LWI;
-    LWIicon = new QListWidgetItem(QIcon(spath),"");
+    LWIicon = new QListWidgetItem(QIcon(spath), "");
     LWIicon->setToolTip(spath);
     ui->listWidgetIcon->insertItem(ui->listWidgetIcon->count() + 1, LWIicon);
     ui->listWidget->setIconSize(ui->listWidget->size());
-    LWI = new QListWidgetItem(QIcon(spath),"");
+    LWI = new QListWidgetItem(QIcon(spath), "");
     //LWI->setTextAlignment(Qt::AlignCenter);
-    ui->listWidget->insertItem(ui->listWidget->count()+1,LWI);
+    ui->listWidget->insertItem(ui->listWidget->count()+1, LWI);
 }
 
 void MainWindow::on_actionVertical_triggered()
@@ -127,59 +138,57 @@ void MainWindow::on_actionSave_triggered()
 {
     QDateTime time = QDateTime::currentDateTime();
     QString filename = time.toString("yyyyMMddhhmmss") + ".jpg";
-    if(path == ""){
-        path = QFileDialog::getSaveFileName(this, "保存图片", "./" + filename , "图片文件(*.jpg *.png *.bmp)");
-    }else{
-        path = QFileInfo(path).absolutePath() + "/" + filename;
-        path = QFileDialog::getSaveFileName(this, "保存图片", path,"图片文件(*.jpg *.png *.bmp)");
-    }
+    path = QFileInfo(path).absolutePath() + "/" + filename;
+    path = QFileDialog::getSaveFileName(this, "保存图片", path,"图片文件(*.jpg *.png *.bmp)");
     if(path.length() != 0){
         if(isArray){
             imageArray.save(path,0,100);
         }else{
             Zoom_Type zoom_type = (Zoom_Type)(comboBox_zoom_type->currentIndex());
             int pw=0, ph=0;
+            QList<int> list_width, list_height;
+            for(int i=0; i<ui->listWidgetIcon->count(); i++){
+                QPixmap pixmap(ui->listWidgetIcon->item(i)->toolTip());
+                list_width << pixmap.width();
+                list_height << pixmap.height();
+            }
+            std::sort(list_width.begin(), list_width.end());
+            std::sort(list_height.begin(), list_height.end());
 
             // 取竖排宽度
             if(ui->listWidget->flow() == QListView::TopToBottom){
-                for(int i=0; i<ui->listWidget->count()-1; i++){
-                    QPixmap pixmapItem1(ui->listWidgetIcon->item(i)->toolTip());
-                    QPixmap pixmapItem2(ui->listWidgetIcon->item(i+1)->toolTip());
-                    if(zoom_type == FIT_SMALL){
-                        pw = qMin(pixmapItem1.width(), pixmapItem2.width());
-                    }else{
-                        pw = qMax(pixmapItem1.width(), pixmapItem2.width());
-                    }
+                if(zoom_type == FIT_SMALL){
+                    pw = list_width.first();
+                }else{
+                    pw = list_width.last();
                 }
             }
 
             // 取横排高度
             if(ui->listWidget->flow() == QListView::LeftToRight){
-                for(int i=0; i<ui->listWidget->count()-1; i++){
-                    QPixmap pixmapItem1(ui->listWidgetIcon->item(i)->toolTip());
-                    QPixmap pixmapItem2(ui->listWidgetIcon->item(i+1)->toolTip());
-                    if(zoom_type == FIT_SMALL){
-                        ph = qMin(pixmapItem1.height(), pixmapItem2.height());
-                    }else{
-                        ph = qMax(pixmapItem1.height(), pixmapItem2.height());
-                    }
+                if(zoom_type == FIT_SMALL){
+                    ph = list_height.first();
+                }else{
+                    ph = list_height.last();
                 }
+
             }
 
             // 竖排计算总高，横排计算总宽
             for(int i=0; i<ui->listWidget->count(); i++){
-                QPixmap pixmapItem(ui->listWidgetIcon->item(i)->toolTip());
+                QPixmap pixmap(ui->listWidgetIcon->item(i)->toolTip());
                 if(ui->listWidget->flow() == QListView::TopToBottom){
                     if(zoom_type == FIT_SMALL){
-                        pixmapItem = pixmapItem.scaledToWidth(pw);
+                        if(pixmap.width() > pw)
+                            pixmap = pixmap.scaledToWidth(pw);
                     }
-                    ph += pixmapItem.height();
+                    ph += pixmap.height();
                 }
                 if(ui->listWidget->flow() == QListView::LeftToRight){
                     if(zoom_type == FIT_SMALL){
-                       pixmapItem = pixmapItem.scaledToHeight(ph);
+                        pixmap = pixmap.scaledToHeight(ph);
                     }
-                    pw += pixmapItem.width();
+                    pw += pixmap.width();
                 }
             }
 
@@ -198,10 +207,9 @@ void MainWindow::on_actionSave_triggered()
                             pixmapPrev = pixmapPrev.scaledToWidth(pw);
                         }
                         y += pixmapPrev.height();
-
                     }
                     if(zoom_type == FIT_SMALL){
-                       pixmapItem = pixmapItem.scaledToWidth(pw, Qt::SmoothTransformation);
+                        pixmapItem = pixmapItem.scaledToWidth(pw, Qt::SmoothTransformation);
                     }
                 }
                 if(ui->listWidget->flow() == QListView::LeftToRight){
@@ -213,7 +221,7 @@ void MainWindow::on_actionSave_triggered()
                         x += pixmapPrev.width();
                     }
                     if(zoom_type == FIT_SMALL){
-                       pixmapItem = pixmapItem.scaledToHeight(ph, Qt::SmoothTransformation);
+                        pixmapItem = pixmapItem.scaledToHeight(ph, Qt::SmoothTransformation);
                     }
                 }
                 painter.drawPixmap(x,y,pixmapItem);
@@ -226,7 +234,7 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "海天鹰拼图 2.2\n一款基于 Qt 的拼图程序，支持横排、竖排、阵列。\n作者：黄颖\nE-mail: sonichy@163.com\n主页：sonichy.96.lt");
+    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "海天鹰拼图 2.3\n一款基于 Qt 的拼图程序，支持横排、竖排、阵列。\n作者：黄颖\nE-mail: sonichy@163.com\n主页：https://github.com/sonichy\nDragDropMode(QAbstractItemView::InternalMove) + ViewMode::ListMode(default)可以排序");
     aboutMB.setIconPixmap(QPixmap(":/icon.png").scaled(200,200));
     aboutMB.exec();
 }
@@ -252,26 +260,36 @@ void MainWindow::on_actionArray_triggered()
 void MainWindow::dragEnterEvent(QDragEnterEvent *e)
 {
     qDebug() << e->mimeData()->formats().at(0);
-    //if(e->mimeData()->hasFormat("text/uri-list")) //只能打开文本文件
-        e->acceptProposedAction(); //可以在这个窗口部件上拖放对象
+    //if(e->mimeData()->hasFormat("text/uri-list")) //只能打开文本列表
+    e->acceptProposedAction(); //可以在这个窗口部件上拖放对象
 }
 
 void MainWindow::dropEvent(QDropEvent *e) //释放对方时，执行的操作
 {
     QList<QUrl> urls = e->mimeData()->urls();
     if(urls.isEmpty())
-        return ;
-
-    QString fileName = urls.first().toLocalFile();
-
-    foreach (QUrl u, urls) {
-        qDebug() << u.toString();
-    }
-    qDebug() << urls.size();
-
-    if(fileName.isEmpty())
         return;
 
-    path = fileName;
-    add(path);
+    foreach (QUrl url, urls) {
+        qDebug() << url.toString();
+        QString filepath = url.toLocalFile();
+        qDebug() << filepath;
+        QString MIME = QMimeDatabase().mimeTypeForFile(filepath).name();
+        QString filetype = MIME.left(MIME.indexOf("/"));
+        qDebug() << MIME << filetype;
+        if (filetype == "image") {
+            add(filepath);
+            path = filepath;
+        }
+    }
+}
+
+void MainWindow::reorder()
+{
+    qDebug() << "reorder";
+    ui->listWidget->clear();
+    for (int i=0; i<ui->listWidgetIcon->count(); i++) {
+        QListWidgetItem *LWI = new QListWidgetItem(QIcon(ui->listWidgetIcon->item(i)->toolTip()), "");
+        ui->listWidget->insertItem(i, LWI);
+    }
 }
