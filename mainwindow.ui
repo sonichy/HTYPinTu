@@ -111,7 +111,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>26</height>
+     <height>28</height>
     </rect>
    </property>
   </widget>
@@ -150,6 +150,9 @@
    <property name="toolTip">
     <string>添加图片</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionVertical">
    <property name="icon">
@@ -186,6 +189,9 @@
    <property name="toolTip">
     <string>保存</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
   </action>
   <action name="actionZoomFit">
    <property name="icon">
@@ -210,6 +216,9 @@
    <property name="toolTip">
     <string>原始大小</string>
    </property>
+   <property name="shortcut">
+    <string>1</string>
+   </property>
   </action>
   <action name="actionNew">
    <property name="icon">
@@ -222,6 +231,9 @@
    <property name="toolTip">
     <string>新建</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionAbout">
    <property name="icon">
@@ -233,6 +245,9 @@
    </property>
    <property name="toolTip">
     <string>关于</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
    </property>
   </action>
   <action name="actionArray">
