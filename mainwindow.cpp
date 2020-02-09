@@ -84,10 +84,8 @@ void MainWindow::on_actionAdd_triggered()
     isArray = false;
     if (path == "") path = ".";
     QStringList SL_path = QFileDialog::getOpenFileNames(this, "打开图片", path, "图片文件(*.jpg *.jpeg *.png *.bmp)");
+    SL_path.sort();
     qDebug() << SL_path;
-    //    if(path.length() != 0){
-    //        add(path);
-    //    }
     for(int i=0; i<SL_path.length(); i++){
         QString filepath = SL_path.at(i);
         qDebug() << filepath;
