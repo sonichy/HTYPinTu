@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>add.png</file>
-        <file>icon.png</file>
+        <file>HTYPinTu.png</file>
         <file>HL.png</file>
         <file>VL.png</file>
         <file>save.png</file>

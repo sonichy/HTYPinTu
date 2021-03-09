@@ -1,9 +1,12 @@
 # Qt 海天鹰拼图
 基于 Qt 的拼图程序，横向或竖向排列，保存拼图。  
-已编译好的 HTYPinTu 程序适用 64 位 Linux 系统 Qt5 环境，双击运行，其他版本自行编译。  
+已编译好的 HTYPinTu 程序适用 64 位 Linux 系统 Qt5.11 环境，双击运行，其他版本自行编译。  
 
 ![alt](preview.png)  
 
+### 2.4 (2021-03-09)
+* 使用 QLabel 代替 QListWidget 显示拼图结果，所见即所得。
+* 图标增加删除右键。
 ### 2.3
 * 增加：左侧图标列表拖放排序（DragDropMode(QAbstractItemView::InternalMove) + ViewMode::ListMode(default)）。
 * 增加：支持多个文件拖放打开。

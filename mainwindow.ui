@@ -21,14 +21,20 @@
   </property>
   <property name="windowIcon">
    <iconset resource="res.qrc">
-    <normaloff>:/icon.png</normaloff>:/icon.png</iconset>
+    <normaloff>:/HTYPinTu.png</normaloff>:/HTYPinTu.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="acceptDrops">
     <bool>true</bool>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
     <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
      <number>0</number>
     </property>
     <property name="bottomMargin">
@@ -40,7 +46,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QListWidget" name="listWidgetIcon">
+       <widget class="QListWidget" name="listWidget">
         <property name="minimumSize">
          <size>
           <width>130</width>
@@ -52,6 +58,9 @@
           <width>130</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="contextMenuPolicy">
+         <enum>Qt::CustomContextMenu</enum>
         </property>
         <property name="acceptDrops">
          <bool>true</bool>
@@ -86,19 +95,29 @@
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="listWidget">
-        <property name="acceptDrops">
+       <widget class="QScrollArea" name="scrollArea">
+        <property name="widgetResizable">
          <bool>true</bool>
         </property>
-        <property name="flow">
-         <enum>QListView::TopToBottom</enum>
-        </property>
-        <property name="isWrapping" stdset="0">
-         <bool>false</bool>
-        </property>
-        <property name="viewMode">
-         <enum>QListView::IconMode</enum>
-        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>666</width>
+           <height>464</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>
@@ -111,7 +130,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>28</height>
+     <height>36</height>
     </rect>
    </property>
   </widget>
@@ -130,8 +149,6 @@
    </attribute>
    <addaction name="actionNew"/>
    <addaction name="actionAdd"/>
-   <addaction name="actionVertical"/>
-   <addaction name="actionHorizontal"/>
    <addaction name="actionArray"/>
    <addaction name="actionZoomOriginal"/>
    <addaction name="actionZoomFit"/>
@@ -152,30 +169,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
-   </property>
-  </action>
-  <action name="actionVertical">
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/VL.png</normaloff>:/VL.png</iconset>
-   </property>
-   <property name="text">
-    <string>vertical</string>
-   </property>
-   <property name="toolTip">
-    <string>竖排</string>
-   </property>
-  </action>
-  <action name="actionHorizontal">
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/HL.png</normaloff>:/HL.png</iconset>
-   </property>
-   <property name="text">
-    <string>horizontal</string>
-   </property>
-   <property name="toolTip">
-    <string>横排</string>
    </property>
   </action>
   <action name="actionSave">
